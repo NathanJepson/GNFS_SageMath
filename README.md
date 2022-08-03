@@ -15,8 +15,8 @@ https://wstein.org/misc/aly-lll/gnfs.html
 However, there is a slight modification needed to make to his code in order to make it work in the year 2022:
 https://web.archive.org/web/20220724010535/https://groups.google.com/g/sage-support/c/LTQjSUDoT8Q
 
-I have included a Jupyter notebook, and a .Sage file of the same code (if you want to run it in a sage cell for some reason). 
-To run in a sage cell, run it like this:
+I have included a Jupyter notebook, and a .Sage file of the same code (if you want to run it in a sage shell for some reason). 
+To run in a sage shell, run it like this:
 ````
 load("GNFS_v1.0.sage")
 ````
