@@ -22,3 +22,7 @@ To run in a sage cell, run it like this:
 I would recommend utilitzing the configuration file, and make any modifications to it that you wish. To comment out any lines in the configuration file, include a "#" as the first character. Make sure to avoid using spaces when possible in the configuration file (especially on either end of an equals "=" sign). 
 
 The complete implementation is not yet done, there are a lot of features yet to add. 
+
+![image](https://user-images.githubusercontent.com/61210670/182726245-0d45c1fe-166d-4350-804d-a70e06645b2b.png)
+
+![image](https://user-images.githubusercontent.com/61210670/182726291-0d2db6a8-916f-40cf-a146-3c16ee025144.png)
