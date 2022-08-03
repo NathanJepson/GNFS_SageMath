@@ -17,8 +17,9 @@ https://web.archive.org/web/20220724010535/https://groups.google.com/g/sage-supp
 
 I have included a Jupyter notebook, and a .Sage file of the same code (if you want to run it in a sage cell for some reason). 
 To run in a sage cell, run it like this:
-     load("GNFS_v1.0.sage")
-
+````
+load("GNFS_v1.0.sage")
+````
 I would recommend utilitzing the configuration file, and make any modifications to it that you wish. To comment out any lines in the configuration file, include a "#" as the first character. Make sure to avoid using spaces when possible in the configuration file (especially on either end of an equals "=" sign). 
 
 The complete implementation is not yet done, there are a lot of features yet to add. 
