@@ -1,7 +1,7 @@
 # GNFS_SageMath
 General Number Field Sieve Factoring Algorithm in SageMath
 
-This is my implementation of the General Number Field Sieve (or GNFS) algorithm, which is the fastest known factoring algorithm on classical computers. 
+This is my implementation of the General Number Field Sieve (or GNFS) algorithm, which is the fastest known prime factorization algorithm on classical computers. 
 https://en.wikipedia.org/wiki/General_number_field_sieve
 
 The General Number Field Sieve algorithm has been used to factor RSA keys up to 512 bits long, and is the reason why you should never use RSA-512 (or RSA-1024 for that matter).
