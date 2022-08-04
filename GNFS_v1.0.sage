@@ -516,11 +516,10 @@ if (result[2] == True or len(solutions) > 0):
             else:
                 if (verbose):
                     print('Trivial factorization found:',u,',',v)
-            
+
+print('\n')
+print('Non-trivial factorizations:',nonTrivialFactorizations)
 if (record_execution_time == True):
     theTime2 = (time.time(), time.process_time())
-    print('\n')
-    print('Non-trivial factorizations:',nonTrivialFactorizations)
     print('Elapsed seconds:',theTime2[0]-theTime[0])
     print('Elapsed CPU time:',theTime2[1]-theTime[1])
-
