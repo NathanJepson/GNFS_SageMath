@@ -11,7 +11,7 @@ ACKNOWLEDGEMENTS:
 In terms of calculating squares and square roots in Z[θ], I have relied on the code of Professor William Stein:
 https://wstein.org/wiki/ant07(2f)projects(2f)shumow_raw.html </br>
 https://wstein.org/misc/aly-lll/gnfs.html </br>
-Worth noting that Stein did say that "In reality this would be done with the CRT." Using the Chinese Reminader Theorem to calculate square roots of polynomials might be implemented in a future version. 
+Worth noting that Stein did say that "In reality this would be done with the CRT." Using the Chinese Remainder Theorem to calculate square roots of polynomials might be implemented in a future version. 
 
 
 There is a slight modification needed to make to Stein's code in order to make it work in the year 2022:
