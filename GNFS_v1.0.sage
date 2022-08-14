@@ -131,7 +131,7 @@ def GetAlgebraicFactorBase(f,lenAlgFactorBase,d):
     currentPrime = 2
     while (len(result) < lenAlgFactorBase):
         countedPrimes = 0
-        for r in range(currentPrime + 10):
+        for r in range(currentPrime + 1):
             if ( (useFunct(f,r,currentPrime) % currentPrime) == 0 and countedPrimes <= d):
                 result.append((r,currentPrime))
                 countedPrimes+=1
@@ -156,7 +156,7 @@ def GetQuadraticCharacterBase(f,lenQuadCharBase,d,alg_factor_base):
     while (len(result) < lenQuadCharBase):
         countedPrimes = 0
         
-        for s in range(currentPrime + 10):
+        for s in range(currentPrime + 1):
             if (currentPrime in usedPrimes):
                 break
                 
@@ -259,162 +259,171 @@ def runIt(n,m,f,d,a_lb,a_ub,b_lb,b_ub,depth,lengthRow,rat_factor_base,alg_factor
     r_mat = matrix(0,lengthRow)
     tuples = []
     
-    def get_factors():
-        pass
+    rational_remainingPrimes = set()
+    rational_remainingPrimes2 = set()
+    rational_remainingPrimes3 = set()
     
+    def get_factors(numA,algebraic=False):
+        result = []
+        len_divisors = None
+        
+        if (algebraic):
+            len_divisors = len(alg_factor_base)
+        else:
+            len_divisors = len(rat_factor_base)
+            
+        for i in range(len_divisors):
+            if (numA == 1):
+                break
+                
+            if (algebraic):
+                thisFactor = alg_factor_base[i][1]
+            else:
+                thisFactor = rat_factor_base[i]
+                
+            exponent_tracker = 0
+            
+            while(thisFactor.divides(numA)):
+                    
+                exponent_tracker += 1
+                numA = numA // thisFactor
+                
+            if (exponent_tracker > 0):
+                result.append((thisFactor,exponent_tracker))
+                
+        
+        if (numA != 1 and is_prime(numA) and (not algebraic)):
+            if (numA in rational_remainingPrimes):
+                if (numA in rational_remainingPrimes2):
+                    rational_remainingPrimes3.add(numA)
+                else:
+                    rational_remainingPrimes2.add(numA)
+            else:
+                rational_remainingPrimes.add(numA)
+                
+        CompletelyFactored = False
+        
+        if (numA == 1):
+            CompletelyFactored = True
+        
+        return result,CompletelyFactored
+    
+    
+        
     for a in range(a_lb,a_ub):
         for b in range(b_lb,b_ub):
-            
-            if (b == 0):
-                continue #Divide-by-zero evasion
                 
             r = (a + (b*m))
             r_alg = (power_mod((-1*b),d,n) * (useFunct(f,(a*power_mod(b,-1,n)*-1),n))) % n
             r_alg_2 = abs(r_alg-n)
-              
+            
+            if (r == 0 or r_alg == 0):
+                continue
+                
             depth_additions = []
             
             for i in range(depth):
                 depth_additions.append(r_alg_2 + (n*(i)))
             
-            if (r == 0 or r_alg == 0):
-                continue
-
-            r_factors = factor(int(r))
-
-            r_alg_factors = factor(int(r_alg))
-            r_alg_factors_depthier = []
-            
-            for i in range(depth):
-                r_alg_factors_depthier.append(factor(int(depth_additions[i])%n)) #Modulo n, fixme?
-                
-            isIn_rat_fact_base = False
-            rat_fact_base_match = True #All r factors are in rational factor base
-
-            isIn_alg_fact_base = False
-            alg_fact_base_match = True #All r_alg factors are in algebraic factor base
-            
-            isIn_depthier_alg_fact_base = False
-            depth_alg_fact_base_match = True #All r_alg factors are in one depthier algebraic factor base
-            
-            for item in r_factors:
-                isIn_rat_fact_base = False
-
-                for factorItem in rat_factor_base:
-                    if (factorItem == item[0]):
-                        isIn_rat_fact_base=True
-                        break
-                if (not isIn_rat_fact_base):
-                    rat_fact_base_match = False
-                    break
-                    
-            if (not (rat_fact_base_match)): #If a + bm factors are not in the rational factor base
+            factor_r = get_factors(int(r))
+            r_factors = factor_r[0]
+            rat_fact_base_match = factor_r[1] #Completely factored over the rational factor base
+            if (not rat_fact_base_match): #If a + bm factors are not in the rational factor base
                 continue
             
+            factor_r_alg = get_factors(int(r_alg),True)
+            r_alg_factors = factor_r_alg[0]
+            alg_fact_base_match = factor_r_alg[1] #If a + bθ factors completely over the algebraic factor base
+        
+            depth_alg_fact_base_match = False #All r_alg factors are in one depthier algebraic factor base
             
-            for item in r_alg_factors:
-                isIn_alg_fact_base = False
-
-                for factorItem in alg_factor_base:
-                    if (abs(factorItem[1]) == abs(item[0])): #Using absolute value, FIXME?
-                        isIn_alg_fact_base=True
-                        break
-                        
-                if (not isIn_alg_fact_base):
-                    alg_fact_base_match = False
-                    break
-            
-            if (not (rat_fact_base_match and alg_fact_base_match)):
-                relevantList = None
-
+            if (not alg_fact_base_match):
                 for i in range(depth):
-
-                    tmpList = r_alg_factors_depthier[i]
-
-                    for thisFactor in tmpList:
-                        isIn_depthier_alg_fact_base = False
-
-                        for factorItem in alg_factor_base:
-                            if (abs(factorItem[1]) == abs(thisFactor[0])): #Using absolute value, FIXME?
-                                isIn_depthier_alg_fact_base=True
-                                break
-
-                        if (not isIn_depthier_alg_fact_base):
-                            depth_alg_fact_base_match = False
-                            break
-                            
-                    if (depth_alg_fact_base_match == True):
-                        relevantList = copy.deepcopy(tmpList)
+                    get_r_alg_depthier_factors = get_factors(int(depth_additions[i])%n,True)
+                    r_alg_depth_factors = get_r_alg_depthier_factors[0]
+                    depth_alg_fact_base_match = get_r_alg_depthier_factors[1]
+                    
+                    #r_alg_factors_depthier.append(factor(int(depth_additions[i])%n)) #Modulo n, fixme?
+                    #r_alg_factors_depthier.append(r_alg_depth_factors)
+                    
+                    if (depth_alg_fact_base_match):
+                        r_alg_factors = r_alg_depth_factors
                         break
+                
+            if (not (alg_fact_base_match or depth_alg_fact_base_match)): #If a + bθ is not factorable over any algebraic factor base
+                continue
+            
+
+            #if (r_alg_factors == None):
+            #    print(r_alg_factors)
+            #    print('R_alg_factors is none, uh oh!','\n','a:',a,'b:',b,'r_alg:',r_alg)
+            #    continue
+            assert(r_alg_factors != None) #FIXME 
+
+            new_row_r = [0 for j in range(lengthRow)]
+
+            if (r >= 0):
+                new_row_r[0] = 0
             else:
-                depth_alg_fact_base_match = False
-            
-            if ( (rat_fact_base_match and alg_fact_base_match) or (rat_fact_base_match and depth_alg_fact_base_match)):
-                
-                if (rat_fact_base_match and depth_alg_fact_base_match):
-                    r_alg_factors = copy.deepcopy(relevantList)
-                    
-                if (r_alg_factors == None):
-                    print(r_alg_factors)
-                    print('R_alg_factors is none, uh oh!','\n','a:',a,'b:',b,'r_alg:',r_alg)
-                    continue
-                    
-                new_row_r = [0 for j in range(lengthRow)]
+                new_row_r[0] = 1
 
-                if (r >= 0):
-                    new_row_r[0] = 0
-                else:
-                    new_row_r[0] = 1
+            for i in range(len(rat_factor_base)):
+                for j in range(len(r_factors)):
+                    if (rat_factor_base[i] == r_factors[j][0]):
+                        new_row_r[i+1] = r_factors[j][1]%2
+                        break
 
-                for i in range(len(rat_factor_base)):
-                    for j in range(len(r_factors)):
-                        if (rat_factor_base[i] == r_factors[j][0]):
-                            new_row_r[i+1] = r_factors[j][1]%2
-                            break
 
-            
-                #Only one such pair can have a ≡ −br (mod p). Such an (r, p) pair is the one
-                #...that will be “responsible” for counting the number of times p divides N(a + bθ)
-                usedPrimes = set()
-                
-                for i in range(len(alg_factor_base)):
-                    
-                    thisR = alg_factor_base[i][0]
-                    thisPrime = alg_factor_base[i][1]
-                    
-                    if (thisPrime in usedPrimes):
-                        continue
-                    
-                    for j in range(len(r_alg_factors)):
-                        if (thisPrime == r_alg_factors[j][0]):
+            usedPrimes = set()
+            thisPrime = None
+            for i in range(len(alg_factor_base)):
+
+                thisR = alg_factor_base[i][0]
+                thisPrime = alg_factor_base[i][1]
+
+                #"A first degree prime ideal represented by the pair (r, p) divides <a + bθ> if and only if p
+                #....divides N(a + bθ), which occurs if and only if a ≡ −br (mod p)"
+                #.......
+                #"Only one such pair can have a ≡ −br (mod p). Such an (r, p) pair is the one
+                #...that will be “responsible” for counting the number of times p divides N(a + bθ)"
+                #...--Matthew E. Briggs
+                for j in range(len(r_alg_factors)):
+                    if (thisPrime == r_alg_factors[j][0]):
+                        if (thisPrime in usedPrimes):
                             if ( (a % thisPrime) == (-1*b*thisR)%thisPrime):
                                 new_row_r[i+1+len(rat_factor_base)] = r_alg_factors[j][1]%2
+                                #Unsure if I should comment this line out based on the "only one" comment from Briggs above      
+                        else:
+                            if ((a % thisPrime) == (-1*b*thisR)%thisPrime):
+                                new_row_r[i+1+len(rat_factor_base)] = r_alg_factors[j][1]%2
                                 usedPrimes.add(thisPrime)
-                                break
-                            
-                #counter1 = 0
-                for i in range(len(quad_character_base)):
-                    s = quad_character_base[i][0]
-                    q = quad_character_base[i][1]
 
-                    if (kronecker((a + (b*s)),q) == 1):
-                        new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 0
-                        #counter1 += 1
-                    elif (kronecker((a + (b*s)),q) == 0):
-                        new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 1
-                        #counter1 += 1
-                    else:
-                        new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 1
-                        #counter1 += 1
-                #if (counter1 >= 6):
-                #    print('Higher probability.')
-                r_mat = r_mat.insert_row(r_mat.nrows(), new_row_r)
-                tuples.append((a,b))
+            #counter1 = 0
+            for i in range(len(quad_character_base)):
+                s = quad_character_base[i][0]
+                q = quad_character_base[i][1]
+
+                if (kronecker((a + (b*s)),q) == 1):
+                    new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 0
+                    #counter1 += 1
+                elif (kronecker((a + (b*s)),q) == 0):
+                    new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 1
+                    #counter1 += 1
+                else:
+                    new_row_r[i+1+len(rat_factor_base)+len(alg_factor_base)] = 1
+                    #counter1 += 1
+
+            #if (counter1 >= SOME_THRESHOLD):
+            #    print('Higher probability.')
+
+            r_mat = r_mat.insert_row(r_mat.nrows(), new_row_r)
+            tuples.append((a,b))
+                
                 
     if (r_mat.nrows() < lengthRow):
         print('You\'re going to need to increase the sieve size to get about',lengthRow-r_mat.nrows(),'more rows.')
-        return r_mat,tuples,False,lengthRow-r_mat.nrows()
-    return r_mat,tuples,True
+        return r_mat,tuples,False,lengthRow-r_mat.nrows(),rational_remainingPrimes2,rational_remainingPrimes3
+    return r_mat,tuples,True,rational_remainingPrimes2,rational_remainingPrimes3
 
 
 if (record_execution_time == True):
@@ -474,6 +483,8 @@ print('Sieving to find more than',lengthRow,'smooth pairs.')
 result = runIt(n,m,f,d,a_lb,a_ub,b_lb,b_ub,depth,lengthRow,rat_factor_base,alg_factor_base,quad_character_base)
 r_mat = result[0]
 tuples = result[1]
+remainingPrimes3 = result[-1]
+remainingPrimes2 = result[-2]
 
 print(len(tuples),'total smooth pairs found.')
 
@@ -516,9 +527,27 @@ if (result[2] == True or len(solutions) > 0):
             else:
                 if (verbose):
                     print('Trivial factorization found:',u,',',v)
+                    
 
-print('\n')
+f = open("more_rational_factorbase_primes.txt", "w")
+#print('More primes you could\'ve added to the rational factor base:')
+f.write('More primes you could\'ve added to the rational factor base:')
+#print('Strong candidates:')
+f.write('\n')
+f.write('Strong candidates:')
+#print('\n')
+f.write('\n')
+for x in remainingPrimes3:
+    f.write(str(x)+'\n')
+    #print(x,end=" ")
+#print('Mediocre candidates:')
+for x in remainingPrimes2:
+    f.write(str(x)+'\n')
+#    print(x,end=" ")
+f.close()
+
 print('Non-trivial factorizations:',nonTrivialFactorizations)
+
 if (record_execution_time == True):
     theTime2 = (time.time(), time.process_time())
     print('Elapsed seconds:',theTime2[0]-theTime[0])
